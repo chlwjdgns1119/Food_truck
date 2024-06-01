@@ -21,6 +21,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         lastName: name.givenName,
         photo: photos[0].value,
       };
+      
       console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 user:', user);
       done(null, user);
     } catch (error) {

@@ -18,23 +18,25 @@ export class AuthController {
     console.log('GET google/login - googleAuth 실행');
   }
 
-/*   @Get('google/callback')
+  @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res() res){
     if(req.session.user){
-      console.log(req.session.user)
       console.log("session을 통한 로그인");
+      return res.redirect('/');
     }
     else{
+      const user = await this.authService.googleLogin(req);
       req.session.user = user;
 
       console.log("google_auth를 통한 로그인");
-      console.log(req.session)
+      console.log(req.session.user);
+      return res.redirect('/');
     }
 
-    res.redirect('/');
+    return res.redirect('/');
   }
- */
+
   @Get('/logout')
   logout(@Req() request: Request, @Res() response: Response): void {
     request.session.destroy((err) => {

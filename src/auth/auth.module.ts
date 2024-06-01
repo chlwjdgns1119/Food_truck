@@ -7,9 +7,16 @@ import { UserModel } from 'src/user/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from 'src/user/user.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserModel]), JwtModule, UserModule],
+  imports: [TypeOrmModule.forFeature([UserModel]), 
+  JwtModule, 
+  UserModule,
+  PassportModule.register({
+    session: true,
+  }),
+  ],
   controllers: [AuthController],
   providers: [AuthService, GoogleStrategy],
 })

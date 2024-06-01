@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as passport from 'passport';
 import * as session from 'express-session';
 import * as FileStore from 'session-file-store';
 
@@ -11,6 +12,7 @@ async function bootstrap() {
   app.use(  
     session({
       store: new FileStoreSession({
+        
         path: '/workspaces/Food_truck/sessions', // 세션 파일이 저장될 디렉토리를 지정합니다.
       }),
       secret: 'my-secret',
@@ -18,6 +20,9 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   await app.listen(3000);
 }
