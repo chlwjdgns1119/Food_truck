@@ -10,7 +10,8 @@ import { UserModule } from 'src/user/user.module';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserModel]), 
+  imports: [
+  TypeOrmModule.forFeature([UserModel]),
   JwtModule, 
   UserModule,
   PassportModule.register({

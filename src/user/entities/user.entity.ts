@@ -12,13 +12,13 @@ export class UserModel {
   )
   userid: string;
   
-  @Column()
+  @Column({unique: true})
   email: string;
 
   @Column()
   name: string;
 
-  @Column()
+  @Column({unique: true})
   nickname: string;
 
   @Column({ nullable: true })
@@ -47,6 +47,4 @@ export class UserModel {
 
   @DeleteDateColumn()
   deletedAt: Date;
-
- // 관계 설정 코드 생략
 }

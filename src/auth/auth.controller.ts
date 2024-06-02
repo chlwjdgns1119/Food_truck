@@ -2,16 +2,17 @@ import { Controller, Res, Get, UseGuards, Req, Post, Session, Body } from '@nest
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
-import { MemoryStore } from 'express-session';
-import { RegisterCommonDto } from './dto/register-common.dto';
-
-const store = new MemoryStore();
+import { RegisterDto } from './dto/register-common.dto';
+import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
-// 'google 로그인'버튼 클릭시 호출
+/* // 'google 로그인'버튼 클릭시 호출
   @Get('google/login') // 구글 로그인으로 이동하는 라우터 메서드
   @UseGuards(AuthGuard('google'))  // 여기에서 가드로 가고 googleStrategy에서 validate호출
   async googleLogin(){
@@ -35,7 +36,7 @@ export class AuthController {
     }
 
     return res.redirect('/');
-  }
+  } */
 
   @Get('/logout')
   logout(@Req() request: Request, @Res() response: Response): void {
@@ -48,22 +49,21 @@ export class AuthController {
   }
 
   @Get('common/login')
-  commonLogin(@Req() req){
+  async commonLogin(@Req() req){
     if(req.session.user){
       console.log("대충 내비두면 될듯?");
       console.log(req.session);
     }
     else{
-      const user = this.authService.findByCommon(req.body.id, req.body.password);
-      req.session.user = user;
-      console.log("처음 로그인");
-      console.log(req.session);
+      const user = this.userService.findByUserID(req.body.id);
+      console.log("user");
+      return user;
     }
   }
 
   @Post('common/register')
-  commonRegister(@Body() body: RegisterCommonDto){
-    const user = this.authService.saveUserCommon(body);
+  commonRegister(@Body() body: RegisterDto){
+    const user = this.userService.createUser(body);
     console.log(user)
     return user;
   }
