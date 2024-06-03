@@ -3,6 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
+import { RegisterDto } from './dto/register-common.dto';
+import { UserService } from 'src/user/user.service';
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 
 @Injectable()
@@ -10,9 +14,45 @@ export class AuthService {
   constructor(
     @InjectRepository(UserModel)
     private userRepository: Repository<UserModel>,
-    private jwtService: JwtService,
+    private userService: UserService,
+    private configService: ConfigService,
   ) {}
+      // 회원가입
+      async registerUser(user: RegisterDto): Promise<UserModel> {
 
+        // 이미 사용 중인 아이디, 이메일, 닉네임 확인
+        const useridExists = await this.userRepository.exists({where: {userid: user.userid}});
+        if(useridExists){
+            throw new UnauthorizedException('이미 사용 중인 아이디입니다.');
+        }
+
+        const emailExists = await this.userRepository.exists({where: {email: user.email}});
+        if(emailExists){
+            throw new UnauthorizedException('이미 사용 중인 이메일입니다.');
+        }
+
+        const nicknameExsists = await this.userRepository.exists({where: {nickname: user.nickname}});
+        if(nicknameExsists){
+            throw new UnauthorizedException('이미 사용 중인 닉네임입니다.');
+        }
+
+        const hashPassword = await bcrypt.hash(
+          user.password, process.env.HASH_ROUNDS
+        )
+        user.password
+        // 통과하면 유저 모델 만들기 진행
+        const newUser = this.userService.createUser(user);
+
+        return newUser;
+
+      }
+
+      loginUser(userid: string, password: string){
+
+      }
+
+
+    
 /*   async findByEmailOrSave(email: string, fullName: string, provider: string): Promise<UserModel> {
     try {
       const foundUser = await this.userRepository.findOne({ where: { email } });

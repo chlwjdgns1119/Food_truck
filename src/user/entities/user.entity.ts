@@ -7,9 +7,9 @@ export class UserModel {
   id: number;
 
   @Column({
-    nullable: true
-  }
-  )
+    nullable: true,
+    unique: true,
+  })
   userid: string;
   
   @Column({unique: true})

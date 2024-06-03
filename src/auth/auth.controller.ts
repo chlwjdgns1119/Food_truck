@@ -12,6 +12,16 @@ export class AuthController {
     private readonly userService: UserService,
   ) {}
 
+  @Post('common/register')
+  commonRegister(
+    @Body() body: RegisterDto,
+  ){
+    const newUser = this.authService.registerUser(body);
+
+    return newUser;
+  }
+
+  
 /* // 'google 로그인'버튼 클릭시 호출
   @Get('google/login') // 구글 로그인으로 이동하는 라우터 메서드
   @UseGuards(AuthGuard('google'))  // 여기에서 가드로 가고 googleStrategy에서 validate호출
@@ -38,7 +48,7 @@ export class AuthController {
     return res.redirect('/');
   } */
 
-  @Get('/logout')
+  /* @Get('/logout')
   logout(@Req() request: Request, @Res() response: Response): void {
     request.session.destroy((err) => {
       if (err) {
@@ -66,6 +76,6 @@ export class AuthController {
     const user = this.userService.createUser(body);
     console.log(user)
     return user;
-  }
+  } */
   
 }

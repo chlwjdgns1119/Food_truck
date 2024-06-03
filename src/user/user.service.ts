@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -28,13 +28,4 @@ export class UserService {
     }
 
     // 로그인
-
-    // 회원가입
-
-    async registerUser(user: RegisterDto){
-        // 처음에 로그인 되어 있나 확인
-
-        // 안 되어 있으면 로그인
-        
-    }
 }
