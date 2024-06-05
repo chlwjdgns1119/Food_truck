@@ -1,15 +1,17 @@
 import { Controller, Res, Get, UseGuards, Req, Post, Session, Body } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { RegisterDto } from './dto/register-common.dto';
 import { UserService } from 'src/user/user.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('common/register')
@@ -19,6 +21,16 @@ export class AuthController {
     const newUser = this.authService.registerUser(body);
 
     return newUser;
+  }
+
+  @Get('common/login')
+  async commonLogin(
+    @Body('id') userid: string,
+    @Body('password') password: string,
+  ){
+    const user = this.authService.loginUser(userid, password);
+
+    return user;
   }
 
   

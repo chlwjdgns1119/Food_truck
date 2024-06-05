@@ -1,21 +1,20 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { RegisterDto } from './dto/register-common.dto';
 import { UserService } from 'src/user/user.service';
-import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-
+import { stringify } from 'querystring';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
     @InjectRepository(UserModel)
-    private userRepository: Repository<UserModel>,
-    private userService: UserService,
-    private configService: ConfigService,
+    private readonly userRepository: Repository<UserModel>,
   ) {}
       // 회원가입
       async registerUser(user: RegisterDto): Promise<UserModel> {
@@ -37,9 +36,10 @@ export class AuthService {
         }
 
         const hashPassword = await bcrypt.hash(
-          user.password, process.env.HASH_ROUNDS
+          user.password,
+          parseInt(this.configService.get<string>('HASH_ROUNDS'))
         )
-        user.password
+        user.password = hashPassword;
         // 통과하면 유저 모델 만들기 진행
         const newUser = this.userService.createUser(user);
 
@@ -47,8 +47,20 @@ export class AuthService {
 
       }
 
-      loginUser(userid: string, password: string){
+      async loginUser(userid: string, password: string){
+        const user = await this.userService.findByUserID(userid);
 
+        if(!user){
+          throw new UnauthorizedException('존재하지 않는 아이디입니다.');
+        }
+
+        const pass = await bcrypt.compare(password, user.password);
+
+        if(!pass){
+          throw new UnauthorizedException('비밀번호가 틀렸습니다');
+        }
+
+        return user;        
       }
 
 
