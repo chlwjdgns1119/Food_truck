@@ -17,7 +17,7 @@ export class AuthService {
     private readonly userRepository: Repository<UserModel>,
   ) {}
       // 회원가입
-      async registerUser(user: RegisterDto): Promise<UserModel> {
+      async registerUser(user: RegisterDto){
 
         // 이미 사용 중인 아이디, 이메일, 닉네임 확인
         const useridExists = await this.userRepository.exists({where: {userid: user.userid}});
