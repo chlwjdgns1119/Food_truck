@@ -50,7 +50,6 @@ import { Repository } from 'typeorm';
     }
   
     serializeUser(user: any, done: Function) {
-      console.log(user);
       //user객체는 무거우니, userId만 뽑아서 세션에 저장한다.
       done(null, user.email);
     }
@@ -58,12 +57,13 @@ import { Repository } from 'typeorm';
     async deserializeUser(payload: any, done: Function) {
       return await this.userRepository
         .findOneOrFail({
-          where: { id: payload },
+          where: { email: payload },
         })
         .then((user) => {
-          console.log('user', user);
+          console.log('되는거임?', user);
           done(null, user);
         })
         .catch((err) => done(err));
     }
+
   }

@@ -30,10 +30,16 @@ export class AuthController {
     @Body('password') password: string,
   ){
     const user = this.authService.loginUser(userid, password);
-
+    
     return user;
   }
 
+  @Get('session')
+  getSession(
+    @Req() @Req() req,
+  ){
+    return req.session;
+  }
 
   @Get('common/strategy/login')
   @UseGuards(LocalAuthGuard)
@@ -47,6 +53,7 @@ export class AuthController {
     return {user, sessionData};
   }
 
+  
   
 /* // 'google 로그인'버튼 클릭시 호출
   @Get('google/login') // 구글 로그인으로 이동하는 라우터 메서드

@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from 'src/user/user.module';
 import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './strategies/local.strategy';
+import { LocalSerializer } from './serializer/local-serializer';
 
 @Module({
   imports: [
@@ -19,6 +21,6 @@ import { PassportModule } from '@nestjs/passport';
   }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy],
+  providers: [AuthService, GoogleStrategy, LocalStrategy, LocalSerializer],
 })
 export class AuthModule {}
