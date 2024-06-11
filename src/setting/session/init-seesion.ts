@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+/* import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as session from 'express-session';
 import * as connectRedis from 'connect-redis';
@@ -34,6 +34,27 @@ export function setUpSession(app: INestApplication): void {
             secure: true,
             maxAge: 30000,  //세션이 redis에 저장되는 기간은 maxAge로 조절한다.(ms)
           },
+        }),
+      );
+      app.use(passport.initialize());
+      app.use(passport.session());
+} */
+
+import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as session from 'express-session';
+import * as connectRedis from 'connect-redis';
+import { Redis } from 'ioredis';
+import * as passport from 'passport';
+
+export function setUpSession(app: INestApplication): void {
+  const configService = app.get<ConfigService>(ConfigService);
+
+    app.use(
+        session({
+          secret: 'asasas',  // 세션에 사용될 시크릿 값. 감춰두자.
+          saveUninitialized: false,
+          resave: false,
         }),
       );
       app.use(passport.initialize());
