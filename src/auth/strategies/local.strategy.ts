@@ -47,19 +47,19 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     private readonly authService: AuthService,
   ) {
     super({
-      usernameField: 'id',
+      usernameField: 'userid',
       passwordField: 'password',
     });
   }
 
   async validate(
-    id: string,
+    userid: string,
     password: string,
     done: CallableFunction,
   ): Promise<any> {
-    console.log('validate');
+    console.log('strategy');
     const user = await this.authService.loginUser(
-      id, password
+      userid, password
     );
     if (!user) {
       throw new UnauthorizedException();

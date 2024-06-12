@@ -6,10 +6,15 @@ import { RegisterDto } from './dto/register-common.dto';
 import { UserService } from 'src/user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from './guard/local-auth.guard';
+import { Repository } from 'typeorm';
+import { UserModel } from 'src/user/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Controller('auth')
 export class AuthController {
   constructor(
+    @InjectRepository(UserModel)
+    private readonly userRepository: Repository<UserModel>,
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly configService: ConfigService,
@@ -34,23 +39,31 @@ export class AuthController {
     return user;
   }
 
+  @Get('test')
+  async test(
+    @Body('email') email: string,
+  ){
+    const user = await this.userRepository.findOneOrFail({where: {email}})
+    return user;
+  }
+
   @Get('session')
   getSession(
-    @Req() @Req() req,
+    @Req() req,
   ){
-    return req.session;
+    return req.user;
   }
 
   @Get('common/strategy/login')
   @UseGuards(LocalAuthGuard)
   async commonLoginstrategy(
-    @Req() req: Request,
-    @Body('id') userid: string,
+    @Req() req,
+    @Body('userid') userid: string,
     @Body('password') password: string,
   ){
-    const user = this.authService.loginUser(userid, password);
-    const sessionData = req.session;
-    return {user, sessionData};
+    console.log("controller");
+    const user = req.user;
+    return user;
   }
 
   
