@@ -66,5 +66,4 @@ import { Repository } from 'typeorm';
         })
         .catch((err) => done(err));
     }
-    
   }

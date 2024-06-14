@@ -51,7 +51,8 @@ export class AuthController {
   getSession(
     @Req() req,
   ){
-    return req.user;
+    const data = [req.user, req.session];
+    return data;
   }
 
   @Get('common/strategy/login')
