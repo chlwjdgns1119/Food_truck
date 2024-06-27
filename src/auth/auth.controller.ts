@@ -9,6 +9,7 @@ import { LocalAuthGuard } from './guard/local-auth.guard';
 import { Repository } from 'typeorm';
 import { UserModel } from 'src/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LoggedInGuard } from './guard/logged-in.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -29,33 +30,43 @@ export class AuthController {
     return newUser;
   }
 
+  @UseGuards(LocalAuthGuard)
   @Get('common/login')
   async commonLogin(
-    @Body('id') userid: string,
-    @Body('password') password: string,
+    @Req() req
   ){
-    const user = this.authService.loginUser(userid, password);
-    
-    return user;
+    console.log(req.session.id)
+
+    const user = req.user;
+    const sessionId = req.session.id;
+    return {user, sessionId};
   }
 
-  @Get('test')
+  @UseGuards(LoggedInGuard)
+  @Get('hi')
+  async hi() {
+    return 'hi';
+  }
+
+
+
+/*   @Get('test')
   async test(
     @Body('email') email: string,
   ){
     const user = await this.userRepository.findOneOrFail({where: {email}})
     return user;
-  }
+  } */
 
-  @Get('session')
+/*   @Get('session')
   getSession(
     @Req() req,
   ){
     const data = [req.user, req.session];
     return data;
-  }
+  } */
 
-  @Get('common/strategy/login')
+/*   @Get('common/strategy/login')
   @UseGuards(LocalAuthGuard)
   async commonLoginstrategy(
     @Req() req,
@@ -65,7 +76,7 @@ export class AuthController {
     console.log("controller");
     const user = req.user;
     return user;
-  }
+  } */
 
   
   

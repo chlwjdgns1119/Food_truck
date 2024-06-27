@@ -51,7 +51,7 @@ import { Repository } from 'typeorm';
   
     serializeUser(user: any, done: Function) {
       //user객체는 무거우니, userId만 뽑아서 세션에 저장한다.
-      console.log("serializer");
+      console.log(user);
       done(null, user.email);
     }
   
