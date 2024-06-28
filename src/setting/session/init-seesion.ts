@@ -3,27 +3,34 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as session from 'express-session';
 import * as passport from 'passport';
-import RedisStore from "connect-redis"
 
-const Redis = require("ioredis");
+const RedisStore = require('connect-redis').default;
+const redis = require('ioredis');
+
 
 export function setUpSession(app: INestApplication): void {
   const configService = app.get<ConfigService>(ConfigService);
 
-  const port = configService.get('REDIS_PORT');
-  const host = configService.get('REDIS_HOST');
+/*   const port = configService.get('REDIS_PORT');
+  const host = configService.get('REDIS_HOST'); */
 
-  const redis = new Redis(port, host);
+  const redisClient = new redis({
+    host: "food-truck-session.yp3zmp.ng.0001.apn2.cache.amazonaws.com",
+    port: 6379,
+  });
+
+  // 세션과 Redis를 연결해줄 객체
+  const redisStore = new RedisStore({
+    client: redisClient,
+    ttl: 30,
+  });
 
     app.use(
         session({
           secret: configService.get('SESSION_SECRET'),  // 세션에 사용될 시크릿 값. 감춰두자.
           saveUninitialized: false,
           resave: false,
-          store: new RedisStore({  // 세션 스토어 설정. 여기서 RedisStore를 설정해서 client에 위에서 설정한 레디스를 입력하자.
-            client: client,
-            ttl: 30,  // time to live
-          }),
+          store: redisStore,
           cookie: {
             httpOnly: true,
             secure: false,
