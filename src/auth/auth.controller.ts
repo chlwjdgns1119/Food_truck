@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { UserModel } from 'src/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoggedInGuard } from './guard/logged-in.guard';
+import { createClient } from '@redis/client';
 
 @Controller('auth')
 export class AuthController {
