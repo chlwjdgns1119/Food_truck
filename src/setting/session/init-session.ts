@@ -3,19 +3,17 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as session from 'express-session';
 import * as passport from 'passport';
-import {createClient} from "redis"
+import Redis from "ioredis"
 
 export function setUpSession(app: INestApplication): void {
   const configService = app.get<ConfigService>(ConfigService);
 
   const RedisStore = require("connect-redis").default;
 
-  const redisClient = createClient({
-    url: 'redis://foodtruck-sessionstore.yp3zmp.ng.0001.apn2.cache.amazonaws.com:6379',
-  });
+  const redisclient = new Redis("rediss://default:AduHAAIncDEyMDdiODJlNmU0MGM0ZmIyODhmYjMwOTM5ZmI2ODNlNHAxNTYxOTk@optimum-chigger-56199.upstash.io:6379");
   
   const redisStore = new RedisStore({
-    client: redisClient,
+    client: redisclient,
     ttl: 30,
   });
 

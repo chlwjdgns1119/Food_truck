@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import * as passport from 'passport'
 import * as session from 'express-session';
 import * as FileStore from 'session-file-store';
-import { setUpSession } from './setting/session/init-seesion';
+import { setUpSession } from './setting/session/init-session';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
