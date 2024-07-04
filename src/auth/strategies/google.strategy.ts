@@ -11,14 +11,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
+  async validate(profile: any, done: VerifyCallback) {
     try {
       const { name, emails, photos } = profile;
       console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 profile:', profile);
+      const fullName = name.firstName + name.lastName;
+
       const user = {
         email: emails[0].value,
-        firstName: name.familyName,
-        lastName: name.givenName,
+        name: fullName,
         photo: photos[0].value,
       };
       

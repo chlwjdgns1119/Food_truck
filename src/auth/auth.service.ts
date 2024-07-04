@@ -63,6 +63,22 @@ export class AuthService {
         return user;        
       }
 
+      async googleLogin(req): Promise<any> {
+        const { email, name, provider } = req.user;
+    
+        
+        const user: UserModel = await this.findByEmailOrSave(email, name, provider); // 이메일로 가입된 회원을 찾고, 없다면 회원가입
+    
+        // JWT 토큰에 포함될 payload
+        const payload = {
+          id: user.id,
+          email: user.email,
+          nickname: user.nickname,
+          name: user.name,
+          isAdmin: user.isAdmin,
+        };
+      }
+
 
     
 /*   async findByEmailOrSave(email: string, fullName: string, provider: string): Promise<UserModel> {

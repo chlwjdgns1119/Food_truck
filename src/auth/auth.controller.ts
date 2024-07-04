@@ -10,15 +10,13 @@ import { Repository } from 'typeorm';
 import { UserModel } from 'src/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoggedInGuard } from './guard/logged-in.guard';
-import { createClient } from '@redis/client';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     @InjectRepository(UserModel)
-    private readonly userRepository: Repository<UserModel>,
     private readonly authService: AuthService,
-    private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -36,11 +34,22 @@ export class AuthController {
   async commonLogin(
     @Req() req
   ){
-    console.log(req.session.id)
+    console.log(req.session.id);
 
-    const user = req.user;
-    const sessionId = req.session.id;
-    return {user, sessionId};
+    return req.user;
+  }
+
+  @Get('/logout')
+  logout(
+    @Req() req: Request,
+    @Res() response: Response
+  ): void {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('세션 삭제 중 에러 발생:', err);
+        response.status(500).send('세션 삭제 중 에러 발생');
+      }
+    });
   }
 
   @UseGuards(LoggedInGuard)
@@ -48,6 +57,24 @@ export class AuthController {
   async hi() {
     return 'hi';
   }
+
+  @Get('google/login') // 구글 로그인으로 이동하는 라우터 메서드
+  @UseGuards(AuthGuard('google'))  // 여기에서 가드로 가고 googleStrategy에서 validate호출
+  async googleLogin(){
+    console.log('GET google/login - googleAuth 실행');
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res() res){
+      const user = await this.authService.googleLogin(req);
+      req.session.user = user;
+
+      console.log("google_auth를 통한 로그인");
+      console.log(req.session.user);
+      return res.redirect('/');
+    }
+  
 
 
 
