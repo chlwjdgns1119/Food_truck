@@ -2,7 +2,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { RegisterDto } from 'src/auth/dto/register-common.dto';
+import { commonRegisterDto } from 'src/auth/dto/common-register.dto';
 
 @Injectable()
 export class UserService {
@@ -19,7 +19,7 @@ export class UserService {
     }
 
     // user 만들기
-    async createUser(user: RegisterDto): Promise<UserModel> {
+    async createUser(user: commonRegisterDto): Promise<UserModel> {
         const userObject = this.userRepository.create(user);
 
         const newUser = await this.userRepository.save(userObject);

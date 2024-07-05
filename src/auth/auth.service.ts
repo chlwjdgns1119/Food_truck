@@ -2,11 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
-import { RegisterDto } from './dto/register-common.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
-import { stringify } from 'querystring';
 import { ConfigService } from '@nestjs/config';
+import { commonRegisterDto } from './dto/common-register.dto';
+import { GoogleLoginInfo } from './dto/google-loginInfo.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
     private readonly userRepository: Repository<UserModel>,
   ) {}
       // 회원가입
-      async registerUser(user: RegisterDto){
+      async registerUser(user: commonRegisterDto){
 
         // 이미 사용 중인 아이디, 이메일, 닉네임 확인
         const useridExists = await this.userRepository.exists({where: {userid: user.userid}});
@@ -63,23 +63,30 @@ export class AuthService {
         return user;        
       }
 
-      async googleLogin(req): Promise<any> {
-        const { email, name, provider } = req.user;
-    
-        
-        const user: UserModel = await this.findByEmailOrSave(email, name, provider); // 이메일로 가입된 회원을 찾고, 없다면 회원가입
-    
-        // JWT 토큰에 포함될 payload
-        const payload = {
-          id: user.id,
-          email: user.email,
-          nickname: user.nickname,
-          name: user.name,
-          isAdmin: user.isAdmin,
-        };
+      async googleLoginOrRegister(userData: GoogleLoginInfo): Promise<UserModel> {
+        const { email, name, provider } = userData;
+
+        const user = this.findByEmailOrSave(email, name, provider);
+
+        return user;
       }
 
-
+      async findByEmailOrSave(email: string, fullName: string, provider: string): Promise<UserModel> {
+        try {
+          const foundUser = await this.userRepository.findOne({ where: { email } });
+          if (foundUser) return foundUser;
+    
+          const newUser = this.userRepository.save({
+            email,
+            name: fullName,
+            nickname: fullName,
+            provider,
+          });
+          return newUser;
+        } catch (error) {
+          throw new Error('사용자를 찾거나 생성하는데 실패하였습니다');
+        }
+      }
     
 /*   async findByEmailOrSave(email: string, fullName: string, provider: string): Promise<UserModel> {
     try {

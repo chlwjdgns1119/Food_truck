@@ -1,16 +1,14 @@
 import { Controller, Res, Get, UseGuards, Req, Post, Session, Body } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
-import { RegisterDto } from './dto/register-common.dto';
-import { UserService } from 'src/user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from './guard/local-auth.guard';
-import { Repository } from 'typeorm';
 import { UserModel } from 'src/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoggedInGuard } from './guard/logged-in.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { commonRegisterDto } from './dto/common-register.dto';
+import { GoogleLoginInfo } from './dto/google-loginInfo.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +20,7 @@ export class AuthController {
 
   @Post('common/register')
   commonRegister(
-    @Body() body: RegisterDto,
+    @Body() body: commonRegisterDto,
   ){
     const newUser = this.authService.registerUser(body);
 
@@ -66,13 +64,14 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req, @Res() res){
-      const user = await this.authService.googleLogin(req);
-      req.session.user = user;
+  async googleAuthRedirect(
+    @Body() body: GoogleLoginInfo,
+    @Res() response: Response
+  ){
+      const user = await this.authService.googleLoginOrRegister(body);
 
-      console.log("google_auth를 통한 로그인");
-      console.log(req.session.user);
-      return res.redirect('/');
+      console.log(user);
+      return response.redirect('/');
     }
   
 

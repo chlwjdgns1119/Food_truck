@@ -1,5 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { GoogleLoginInfo } from '../dto/google-loginInfo.dto';
 
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
@@ -11,22 +12,21 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
-  async validate(profile: any, done: VerifyCallback) {
-    try {
-      const { name, emails, photos } = profile;
-      console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 profile:', profile);
-      const fullName = name.firstName + name.lastName;
+  async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
 
-      const user = {
+      const { name, emails, provider } = profile;
+      console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 profile:', profile);
+      console.log(name)
+      const fullName = name.firstName+ name.lastName;
+
+      const userData: GoogleLoginInfo = {
         email: emails[0].value,
         name: fullName,
-        photo: photos[0].value,
+        provider,
       };
       
-      console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 user:', user);
-      done(null, user);
-    } catch (error) {
-      done(error);
-    }
+      console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 user:', userData);
+      
+      return done(null, userData);
   }
 }
