@@ -6,7 +6,7 @@ import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { commonRegisterDto } from './dto/common-register.dto';
-import { GoogleLoginInfo } from './dto/google-loginInfo.dto';
+import { googleLoginInfo } from './dto/google-loginInfo.dto';
 
 @Injectable()
 export class AuthService {
@@ -47,6 +47,10 @@ export class AuthService {
 
       }
 
+      log(){
+        console.log("a");
+      }
+      
       async loginUser(userid: string, password: string){
         const user = await this.userService.findByUserID(userid);
 
@@ -63,29 +67,29 @@ export class AuthService {
         return user;        
       }
 
-      async googleLoginOrRegister(userData: GoogleLoginInfo): Promise<UserModel> {
-        const { email, name, provider } = userData;
 
-        const user = this.findByEmailOrSave(email, name, provider);
 
+      async findUserByEmail(email: string){
+        const user = await this.userRepository.findOne({where: {email}});
+        
         return user;
       }
 
-      async findByEmailOrSave(email: string, fullName: string, provider: string): Promise<UserModel> {
-        try {
-          const foundUser = await this.userRepository.findOne({ where: { email } });
-          if (foundUser) return foundUser;
-    
-          const newUser = this.userRepository.save({
-            email,
-            name: fullName,
-            nickname: fullName,
-            provider,
-          });
-          return newUser;
-        } catch (error) {
-          throw new Error('사용자를 찾거나 생성하는데 실패하였습니다');
-        }
+      async googleLogin(userData: googleLoginInfo): Promise<UserModel>{
+        const {email, name, provider} = userData;
+
+        const user = await this.findUserByEmail(email);
+
+        if(user) return user;
+
+        const newUser = await this.userRepository.save({
+          email,
+          name,
+          nickname: name,
+          provider,
+        });
+
+        return newUser;
       }
     
 /*   async findByEmailOrSave(email: string, fullName: string, provider: string): Promise<UserModel> {

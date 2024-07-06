@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { GoogleLoginInfo } from '../dto/google-loginInfo.dto';
+import { googleLoginInfo } from '../dto/google-loginInfo.dto';
 
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
@@ -17,9 +17,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       const { name, emails, provider } = profile;
       console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 profile:', profile);
       console.log(name)
-      const fullName = name.firstName+ name.lastName;
+      const fullName = name.familyName+ name.givenName;
 
-      const userData: GoogleLoginInfo = {
+      const userData = {
         email: emails[0].value,
         name: fullName,
         provider,

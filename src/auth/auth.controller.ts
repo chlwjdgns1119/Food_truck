@@ -1,4 +1,4 @@
-import { Controller, Res, Get, UseGuards, Req, Post, Session, Body } from '@nestjs/common';
+import { Controller, Res, Get, UseGuards, Req, Post, Session, Body, ConsoleLogger } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -8,13 +8,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LoggedInGuard } from './guard/logged-in.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { commonRegisterDto } from './dto/common-register.dto';
-import { GoogleLoginInfo } from './dto/google-loginInfo.dto';
+import { googleLoginInfo} from './dto/google-loginInfo.dto';
+import { User } from './decorator/auth.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    @InjectRepository(UserModel)
     private readonly authService: AuthService,
+    @InjectRepository(UserModel)
     private readonly configService: ConfigService,
   ) {}
 
@@ -24,6 +25,7 @@ export class AuthController {
   ){
     const newUser = this.authService.registerUser(body);
 
+    
     return newUser;
   }
 
@@ -65,15 +67,27 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(
+    @User() userData: googleLoginInfo,
+  )
+    {
+      const user = await this.authService.googleLogin(userData);
+      
+      return user;
+    }
+
+
+ /*  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(
     @Body() body: GoogleLoginInfo,
     @Res() response: Response
   ){
-      const user = await this.authService.googleLoginOrRegister(body);
+      const user = await this.authService.loginUser(body.email, body.name);
 
       console.log(user);
       return response.redirect('/');
     }
-  
+   */
 
 
 
