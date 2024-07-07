@@ -40,15 +40,13 @@ export class AuthService {
           parseInt(this.configService.get<string>('HASH_ROUNDS'))
         )
         user.password = hashPassword;
+
+        user.provider = "common";
         // 통과하면 유저 모델 만들기 진행
-        const newUser = this.userService.createUser(user);
+        const newUser = await this.userService.createUser(user);
 
         return newUser;
 
-      }
-
-      log(){
-        console.log("a");
       }
       
       async loginUser(userid: string, password: string){
@@ -67,15 +65,13 @@ export class AuthService {
         return user;        
       }
 
-
-
       async findUserByEmail(email: string){
         const user = await this.userRepository.findOne({where: {email}});
         
         return user;
       }
 
-      async googleLogin(userData: googleLoginInfo): Promise<UserModel>{
+      async googleLoginOrRegister(userData: googleLoginInfo): Promise<UserModel>{
         const {email, name, provider} = userData;
 
         const user = await this.findUserByEmail(email);
@@ -91,39 +87,4 @@ export class AuthService {
 
         return newUser;
       }
-    
-/*   async findByEmailOrSave(email: string, fullName: string, provider: string): Promise<UserModel> {
-    try {
-      const foundUser = await this.userRepository.findOne({ where: { email } });
-      if (foundUser) return foundUser;
-
-      const newUser = this.userRepository.save({
-        email,
-        name: fullName,
-        nickname: fullName,
-        provider,
-      });
-      return newUser;
-    } catch (error) {
-      throw new Error('사용자를 찾거나 생성하는데 실패하였습니다');
-    }
-  }
-
-  async googleLogin(req): Promise<any> {
-    const { email, firstName, lastName, provider } = req.user;
-
-    const fullName = firstName + lastName;
-    const user: UserModel = await this.findByEmailOrSave(email, fullName, provider); // 이메일로 가입된 회원을 찾고, 없다면 회원가입
-
-    // JWT 토큰에 포함될 payload
-    const payload = {
-      id: user.id,
-      email: user.email,
-      nickname: user.nickname,
-      name: user.name,
-      isAdmin: user.isAdmin,
-    };
-
-    return { access_token: this.jwtService.sign(payload, { expiresIn: process.env.JWT_ACCESS_EXPIRATION_TIME, secret: process.env.ACCESS_SECRET_KEY }) };
-  } */
 }

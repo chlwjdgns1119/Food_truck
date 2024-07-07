@@ -50,19 +50,20 @@ import { Repository } from 'typeorm';
     }
   
     serializeUser(user: any, done: Function) {
-      //user객체는 무거우니, userId만 뽑아서 세션에 저장한다.
+      //user객체는 무거우니, userId만 뽑아서 세션에 저장한다. session store에는 userId만 저장되는 것.
       console.log(user);
       done(null, user.email);
     }
   
+    // deserialize는 요청이 들어왔을 때 req의 cookie에서 session 정보를 뽑아서 req 객체에 다시 user 정보 찾아서 붙여준다.
     async deserializeUser(email: string, done: Function) {
       return await this.userRepository
         .findOneOrFail({
           where: { email},
         })
         .then((user) => {
-          console.log('되는거임?', user);
-          done(null, user);
+          console.log('되는거임?', user); 
+          done(null, user); // 여기서 반환하는 user가 req.user에 정보를 담아준다.
         })
         .catch((err) => done(err));
     }

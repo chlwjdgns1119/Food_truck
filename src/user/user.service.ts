@@ -26,6 +26,4 @@ export class UserService {
         
         return newUser;
     }
-
-    // 로그인
 }

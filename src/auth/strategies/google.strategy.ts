@@ -1,9 +1,13 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { googleLoginInfo } from '../dto/google-loginInfo.dto';
+import { Injectable } from '@nestjs/common';
+import { AuthService } from '../auth.service';
 
+@Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor() {
+  constructor(
+    private readonly authService: AuthService,
+  ) {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -16,7 +20,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
       const { name, emails, provider } = profile;
       console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 profile:', profile);
-      console.log(name)
       const fullName = name.familyName+ name.givenName;
 
       const userData = {
@@ -26,7 +29,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       };
       
       console.log('🚀 🔶 GoogleStrategy 🔶 validate 🔶 user:', userData);
-      
-      return done(null, userData);
+
+      // 그냥 strategy에서 로그인 처리하기로 했음. 인프런 보니 없는 계정 로그인 하려고 할 때 그냥 회원가입시키는거보고 따라하기로 했음.
+      try {
+        const user = await this.authService.googleLoginOrRegister(userData);
+        console.log(user,"strategy");
+        done(null, user);
+      } catch (err) {
+        done(err, false);
+      }
   }
 }

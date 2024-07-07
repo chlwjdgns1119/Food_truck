@@ -7,11 +7,11 @@ import { createClient } from 'redis';
 export class LocalAuthGuard extends AuthGuard('local') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     
-    const can = await super.canActivate(context);
-    if (can) {
+    const activate = (await super.canActivate(context)) as boolean;
+    if (activate) {
       const request = context.switchToHttp().getRequest();
       await super.logIn(request);
     }
-    return true;
+    return activate;
   }
 }

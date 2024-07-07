@@ -36,7 +36,7 @@ export class UserModel {
   @Column({ default: false })
   isAdmin: boolean;
 
-  @Column({ default: 'none' })
+  @Column()
   provider: string;
 
   @CreateDateColumn()

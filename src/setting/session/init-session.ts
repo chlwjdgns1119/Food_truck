@@ -1,4 +1,3 @@
-// setting/session/init.session.ts
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as session from 'express-session';

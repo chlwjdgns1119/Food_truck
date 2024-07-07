@@ -5,6 +5,7 @@ export const User = createParamDecorator(
       const request = ctx.switchToHttp().getRequest();
         
       const user = request.user;
+      
       if(!user){
         throw new InternalServerErrorException("request에 user 프로퍼티가 존재하지 않습니다.");
       }
