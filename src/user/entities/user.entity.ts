@@ -12,13 +12,10 @@ export class UserModel {
   })
   userid: string;
   
-  @Column({unique: true})
+  @Column()
   email: string;
 
   @Column()
-  name: string;
-
-  @Column({unique: true})
   nickname: string;
 
   @Column({ nullable: true })

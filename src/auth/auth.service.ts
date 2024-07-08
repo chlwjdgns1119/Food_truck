@@ -65,23 +65,22 @@ export class AuthService {
         return user;        
       }
 
-      async findUserByEmail(email: string){
-        const user = await this.userRepository.findOne({where: {email}});
+      async findUserByEmail(email: string, provider: string){
+        const user = await this.userRepository.findOne({where: {email, provider}});
         
         return user;
       }
 
       async googleLoginOrRegister(userData: googleLoginInfo): Promise<UserModel>{
-        const {email, name, provider} = userData;
+        const {email, nickname, provider} = userData;
 
-        const user = await this.findUserByEmail(email);
+        const user = await this.findUserByEmail(email, provider);
 
         if(user) return user;
 
         const newUser = await this.userRepository.save({
           email,
-          name,
-          nickname: name,
+          nickname,
           provider,
         });
 
